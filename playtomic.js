@@ -4,7 +4,8 @@ var Playtomic = {};
 {
 	var APIURL,
 		PUBLICKEY,
-		PRIVATEKEY;
+		PRIVATEKEY,
+        SECRETKEY;
   
 	/**
 	 * Initializes the API
@@ -12,15 +13,16 @@ var Playtomic = {};
 	 * @param	privatekey	Your game's private key
 	 * @param	apiurl		The url to your server, eg https://my-server.herokuapp.com
 	 */
-	Playtomic.initialize = function(publickey, privatekey, apiurl) {
+	Playtomic.initialize = function(keys, apiurl) {
 		
 		if(apiurl.lastIndexOf("/") != apiurl.length - 1) {
 			apiurl += "/";
 		}
 		
-		APIURL = apiurl + "v1?publickey=" + publickey;
-		PRIVATEKEY = privatekey;
-		PUBLICKEY = publickey;
+		APIURL = apiurl + "v1?publickey=" + keys.publickey;
+		PRIVATEKEY = keys.privatekey;
+		PUBLICKEY = keys.publickey;
+        SECRETKEY = keys.secretkey || "";
 	};
 	
 	// newsletter
@@ -388,6 +390,7 @@ var Playtomic = {};
 		postdata.section = section;
 		postdata.action = action;
 		postdata.publickey = PUBLICKEY;
+        postdata.secretkey = SECRETKEY;
 		
 		var json = JSON.stringify(postdata);
 		var pda = "data=" + Encode.base64(json) + "&hash=" + Encode.md5(json + PRIVATEKEY);

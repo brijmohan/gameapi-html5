@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Playtomic HTML/JavaScript API Test</title>
+	<style>
+	* { padding: 0px; margin: 0px; font-size: 11px; list-style-type: none; font-family: Verdana, Arial, sans-serif; }
+	body { padding: 10px; background-color: #EEE; }
+	button { padding: 4px; }
+	ul { margin-bottom: 8px; }
+	h2 { margin-bottom: 2px; }
+	input { padding: 2px; background-color: #FFF; border: 1px solid #999; }
+	table { margin-bottom: 4px; }
+	th { text-align: left; font-weight: normal; color: #666; }
+	p { margin-bottom: 6px; }
+	li { margin-bottom: 6px; display: block; }
+	h3 { margin: 2px 0px; color: #333; }
+	ul.list { margin: 6px 0px 6px 10px; }
+	strong { color: #33C; }
+	strong.error { color: #900; }
+	</style>
+</head>
+<body>
+
+	<div id="debug"></div>
+
+	<script src="playtomic.js"></script>
+    <script>
+        
+        var debugContainer = document.getElementById('debug');
+        function printDebug(message) {
+            debugContainer.innerHTML = debugContainer.innerHTML + message;
+        }
+        
+        Playtomic.initialize({"publickey":"testpublickey", "privatekey":"testprivatekey", "secretkey": "testsecretkey"}, "http://localhost:3000/");
+        
+        // Function to submit score of a player
+        function submitScore(player, score, callback) {
+            // basic score
+            var score = {
+                playername: player,
+                playerid: player,
+                points: score,
+                table: "highscores",
+                allowduplicates: true,
+                fields: {
+                  character: "barbarian",
+                  level: 7,
+                  kills: 18
+                }
+              };
+          
+            Playtomic.Leaderboards.save(score, function(response) {
+                if(response.success) {
+                    console.log("Score saved!");
+                    callback(response);
+                } else {
+                    // submission failed because of response.errormessage with response.errorcode
+                }
+            }); 
+        }
+        
+        // Function to show overall paginated score from beginning
+        function showOverallScores(pagenum, pagesize, callback) {
+          // table options
+          var table = {
+            table: "highscores",
+            page: pagenum,
+            perpage: pagesize,
+            highest: true
+          };
+          
+            Playtomic.Leaderboards.list(table, function(scores, numscores, response) {
+                if(response.success) {
+                    console.log(scores.length + " scores returned out of " + numscores);
+
+                    for(var i=0; i<scores.length; i++) {
+                        var score = scores[i];
+                        console.log(" - " + score.name + " got " + score.points + " on " + score.sdate);
+
+                        // including custom data?  score.fields.property
+                    }
+                    
+                    callback(scores, numscores, response);
+                    
+                } else {
+                    // score listing failed because of response.errormessage with response.errorcode
+                }
+            });
+        }
+        
+        // Function to show paginated scores of friends from beginning
+        function showFriendsScores(pagenum, pagesize, frndlist, callback) {
+          // table options
+          var table = {
+            table: "highscores",
+            page: pagenum,
+            perpage: pagesize,
+            highest: true,
+            friendslist: frndlist
+          };
+          
+            Playtomic.Leaderboards.list(table, function(scores, numscores, response) {
+                if(response.success) {
+                    console.log(scores.length + " scores returned out of " + numscores);
+
+                    for(var i=0; i<scores.length; i++) {
+                        var score = scores[i];
+                        console.log(" - " + score.name + " got " + score.points + " on " + score.sdate);
+
+                        // including custom data?  score.fields.property
+                    }
+                    
+                    callback(scores, numscores, response);
+                    
+                } else {
+                    // score listing failed because of response.errormessage with response.errorcode
+                }
+            });
+        }
+        
+        // Function to show paginated scores given a particular time period
+        /**
+         * All possible time periods are 'last7days', 'last30days', 'alltime' (default), 'today' and 'newest'
+         */
+        function showTimebasedScores(mode, pagenum, pagesize, callback) {
+          // table options
+          var table = {
+            table: "highscores",
+            page: pagenum,
+            perpage: pagesize,
+            highest: true,
+            mode: mode
+          };
+          
+            Playtomic.Leaderboards.list(table, function(scores, numscores, response) {
+                if(response.success) {
+                    console.log(scores.length + " scores returned out of " + numscores);
+
+                    for(var i=0; i<scores.length; i++) {
+                        var score = scores[i];
+                        console.log(" - " + score.name + " got " + score.points + " on " + score.sdate);
+
+                        // including custom data?  score.fields.property
+                    }
+                    
+                    callback(scores, numscores, response);
+                    
+                } else {
+                    // score listing failed because of response.errormessage with response.errorcode
+                }
+            });
+        }
+        
+        // Function to show paginated scores given a particular time period among a set of friends
+        /**
+         * All possible time periods are 'last7days', 'last30days', 'alltime' (default), 'today' and 'newest'
+         */
+        function showTimebasedFriendsScores(mode, pagenum, pagesize, frndlist, callback) {
+          // table options
+          var table = {
+            table: "highscores",
+            page: pagenum,
+            perpage: pagesize,
+            highest: true,
+            friendslist: frndlist
+          };
+          
+            Playtomic.Leaderboards.list(table, function(scores, numscores, response) {
+                if(response.success) {
+                    console.log(scores.length + " scores returned out of " + numscores);
+
+                    for(var i=0; i<scores.length; i++) {
+                        var score = scores[i];
+                        console.log(" - " + score.name + " got " + score.points + " on " + score.sdate);
+
+                        // including custom data?  score.fields.property
+                    }
+                    
+                    callback(scores, numscores, response);
+                    
+                } else {
+                    // score listing failed because of response.errormessage with response.errorcode
+                }
+            });
+        }
+        
+        function createRanklist(name, scores) {
+            var scorelist = "<h3> " + name + " </h3>";
+            for(var i = 0; i < scores.length; i++) {
+                scorelist += "<p> " + scores[i].rank + " > " + scores[i].playername + " : " + scores[i].points +" </p>";
+            }
+            return scorelist;
+        }
+        
+        function simulate() {
+            submitScore('brij', 100, function(res) {
+                printDebug("<p>Saved score : brij, 100</p>");
+                submitScore('brij', 75, function(res) {
+                    printDebug("<p>Saved score : brij, 75</p>");
+                    submitScore('mohanty', 50, function(res) {
+                        printDebug("<p>Saved score : mohanty, 50</p>");
+                        submitScore('mohanty', 85, function(res) {
+                            printDebug("<p>Saved score : mohanty, 85</p>");
+                            submitScore('buzo', 38, function(res) {
+                                printDebug("<p>Saved score : buzo, 38</p>");
+                                // All scores submitted
+                                
+                                // Show overall ranklist
+                                showOverallScores(1, 100, function(scores, num, response){
+                                    console.log(scores);
+                                    printDebug(createRanklist("Overall Ranklist:", scores));
+                                });
+                                
+                                // Show friends ranklist
+                                showFriendsScores(1, 100, ["brij", "mohanty"], function(scores, num, response) {
+                                    console.log(scores);
+                                    printDebug(createRanklist("Friends' Overall Ranklist:", scores));
+                                });
+                                
+                                // Show last 7 days ranklist
+                                showTimebasedScores('last7days', 1, 100, function(scores, num, response) {
+                                    console.log(scores);
+                                    printDebug(createRanklist("Last 7 days' Ranklist:", scores));
+                                });
+                                
+                                // Show last 7 days ranklist filtered by friends
+                                showTimebasedFriendsScores('last7days', 1, 100, ["brij", "mohanty"], function(scores, num, response) {
+                                    console.log(scores);
+                                    printDebug(createRanklist("Last 7 days' Friends Ranklist:", scores));
+                                });
+                                
+                            });
+                        });
+                    });
+                });
+            });
+        }
+        
+        simulate();
+    </script>
+</body>
+</html>
